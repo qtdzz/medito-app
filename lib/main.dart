@@ -73,15 +73,17 @@ class _ParentWidgetState extends State<ParentWidget>
           statusBarColor: MeditoColors.transparent),
     );
 
-    checkConnectivity().then((value) {
-      if (!value) {
-        _onTabTapped(2);
-      }
-    });
+    // checkConnectivity().then((value) {
+    //   if (!value) {
+    //     _onTabTapped(2);
+    //   }
+    //   print('done checking connectivity');
+    // });
 
     firstOpenOperations().then((value) {
       setState(() {
         _deletingCache = false;
+        print('done deleting cache');
       });
     });
 
@@ -209,7 +211,7 @@ class _ParentWidgetState extends State<ParentWidget>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       // update session stats when app comes into foreground
-      updateStatsFromBg();
+      // updateStatsFromBg();
     }
   }
 }

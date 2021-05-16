@@ -16,6 +16,7 @@ along with Medito App. If not, see <https://www.gnu.org/licenses/>.*/
 import 'dart:async';
 
 import 'package:Medito/network/api_response.dart';
+import 'package:Medito/network/home/connection_bloc.dart';
 import 'package:Medito/network/home/home_bloc.dart';
 import 'package:Medito/network/home/home_repo.dart';
 import 'package:Medito/network/home/menu_response.dart';
@@ -26,6 +27,7 @@ import 'package:Medito/utils/navigation.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:Medito/widgets/home/courses_row_widget.dart';
 import 'package:Medito/widgets/home/daily_message_widget.dart';
+import 'package:Medito/widgets/home/home_appbar_widget.dart';
 import 'package:Medito/widgets/home/small_shortcuts_row_widget.dart';
 import 'package:Medito/widgets/home/stats_widget.dart';
 import 'package:Medito/widgets/packs/announcement_banner_widget.dart';
@@ -43,7 +45,9 @@ class HomeWidget extends StatefulWidget {
 
 class _HomeWidgetState extends State<HomeWidget> {
   final _bloc = HomeBloc(repo: HomeRepo());
-
+  final _connectionBloc =
+      ConnectionBloc(connectivityChecker: checkConnectivity);
+  ConnectivityResult _connectivityResult;
   final GlobalKey<AnnouncementBannerState> _announceKey = GlobalKey();
 
   final GlobalKey<SmallShortcutsRowWidgetState> _shortcutKey = GlobalKey();
@@ -55,12 +59,15 @@ class _HomeWidgetState extends State<HomeWidget> {
   StreamSubscription<ConnectivityResult> subscription;
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
     _observeNetwork();
+    print('checking init state');
+     _connectionBloc.checkConnection();
+  }
 
-    _bloc.fetchMenu();
-    _bloc.checkConnection();
-
+  @override
+  Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
         body: RefreshIndicator(
@@ -68,15 +75,17 @@ class _HomeWidgetState extends State<HomeWidget> {
             return _refresh();
           },
           child: StreamBuilder<bool>(
-              stream: _bloc.connectionStreamController.stream,
+              stream: _connectionBloc.connectionStreamController.stream,
+              initialData: true,
               builder: (context, connectionSnapshot) {
+                print('connection snapshot ${connectionSnapshot.data} - ${connectionSnapshot.hasData && !connectionSnapshot.data}' );
                 if (connectionSnapshot.hasData && !connectionSnapshot.data) {
                   return _buildErrorPacksWidget();
                 } else {
                   return ListView(
                     physics: AlwaysScrollableScrollPhysics(),
                     children: [
-                      _getAppBar(context),
+                      HomeAppBar(bloc: _bloc),
                       AnnouncementBanner(key: _announceKey),
                       SmallShortcutsRowWidget(
                         key: _shortcutKey,
@@ -100,7 +109,7 @@ class _HomeWidgetState extends State<HomeWidget> {
 
   Column _buildErrorPacksWidget() => Column(
         children: [
-          _getAppBar(context),
+          HomeAppBar(bloc: _bloc),
           Expanded(child: ErrorPacksWidget(onPressed: () => _refresh())),
         ],
       );
@@ -126,108 +135,12 @@ class _HomeWidgetState extends State<HomeWidget> {
   }
 
   Future<void> _refresh() {
-    _bloc.checkConnection();
+    _connectionBloc.checkConnection();
     _announceKey.currentState?.refresh();
     _shortcutKey.currentState?.refresh();
     _coursesKey.currentState?.refresh();
     _dailyMessageKey.currentState?.refresh();
     return _bloc.fetchMenu(skipCache: true);
-  }
-
-  AppBar _getAppBar(BuildContext context) {
-    return AppBar(
-      backgroundColor: MeditoColors.darkMoon,
-      elevation: 0,
-      actionsIconTheme: IconThemeData(color: MeditoColors.walterWhite),
-      title: _getTitleWidget(context),
-      actions: <Widget>[
-        StreamBuilder<ApiResponse<MenuResponse>>(
-            stream: _bloc.menuList.stream,
-            initialData: ApiResponse.completed(MenuResponse(data: [])),
-            builder: (context, snapshot) {
-              switch (snapshot.data.status) {
-                case Status.LOADING:
-                case Status.ERROR:
-                  return GestureDetector(
-                    onTap: () => _bloc.fetchMenu(skipCache: true),
-                    child: Icon(
-                      Icons.more_vert,
-                      color: MeditoColors.walterWhite,
-                    ),
-                  );
-                case Status.COMPLETED:
-                  return _getMenu(context, snapshot);
-                  break;
-              }
-              return Container();
-            }),
-      ],
-    );
-  }
-
-  PopupMenuButton<MenuData> _getMenu(
-      BuildContext context, AsyncSnapshot<ApiResponse<MenuResponse>> snapshot) {
-    return PopupMenuButton<MenuData>(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(4.0),
-      ),
-      color: MeditoColors.deepNight,
-      onSelected: (MenuData result) {
-        NavigationFactory.navigateToScreenFromString(
-            result.itemType, result.itemPath, context);
-      },
-      itemBuilder: (BuildContext context) {
-        return snapshot.data.body.data.map((MenuData data) {
-          return PopupMenuItem<MenuData>(
-            value: data,
-            child: Text(data.itemLabel,
-                style: Theme.of(context).textTheme.headline4),
-          );
-        }).toList();
-      },
-    );
-  }
-
-  Widget _getTitleWidget(BuildContext context) => FutureBuilder<String>(
-      future: _bloc.getTitleText(DateTime.now()),
-      initialData: 'Medito',
-      builder: (context, snapshot) {
-        return GestureDetector(
-          onLongPress: () => _showVersionPopUp(context),
-          child:
-              Text(snapshot.data, style: Theme.of(context).textTheme.headline1),
-        );
-      });
-
-  Future<void> _showVersionPopUp(BuildContext context) async {
-    var packageInfo = await PackageInfo.fromPlatform();
-
-    var version = packageInfo.version;
-    var buildNumber = packageInfo.buildNumber;
-
-    var line1 = 'Version: $version - Build Number: $buildNumber';
-
-    var prefs = await SharedPreferences.getInstance();
-    var userID = prefs.getString(USER_ID) ?? 'None';
-    final snackBar = SnackBar(
-        content: GestureDetector(
-          onTap: () {
-            Clipboard.setData(ClipboardData(text: '$line1 $userID'));
-          },
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(line1, style: TextStyle(color: MeditoColors.meditoTextGrey)),
-              Text(userID, style: TextStyle(color: MeditoColors.meditoTextGrey))
-            ],
-          ),
-        ),
-        backgroundColor: MeditoColors.midnight);
-
-    // Find the Scaffold in the Widget tree and use it to show a SnackBar!
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   @override
@@ -241,7 +154,14 @@ class _HomeWidgetState extends State<HomeWidget> {
     subscription = Connectivity()
         .onConnectivityChanged
         .listen((ConnectivityResult result) {
-      _refresh();
+      print('checking observe network outside current $_connectivityResult - new $result');
+
+      _connectivityResult ??= result;
+          if (_connectivityResult != result) {
+            print('checking observe network');
+            _connectivityResult = result;
+            _refresh();
+          }
     });
   }
 }
