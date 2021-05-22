@@ -44,6 +44,7 @@ Future httpGet(String url,
   assert(auth != null);
 
   if (cache == null) {
+    print('==== GET no cache $url');
     final response = await get(
       Uri.parse(url),
       headers: {HttpHeaders.authorizationHeader: auth},
@@ -65,6 +66,7 @@ Future httpGet(String url,
     }
     return json.decode(response.body);
   }
+  print('==== GET use cache $url');
   return json.decode(cache);
 }
 

@@ -290,22 +290,21 @@ bool longerThanOneDayAgo(DateTime lastDayInStreak, DateTime now) {
 }
 
 Future updateStatsFromBg() async {
-  // var read = await readJSONFromCache('stats');
-  // print('read ->$read');
-  print('doing something');
-  // if (read.isNotEmptyAndNotNull()) {
-  //   print('update stats');
-  //   var map = decoded(read);
-  //   var id = map['id'];
-  //   var secsListened = map['secsListened'];
-  //
-  //   if (map != null && map.isNotEmpty) {
-  //     await updateStreak();
-  //     await incrementNumSessions();
-  //     await markAsListened(id);
-  //     await updateMinuteCounter(Duration(seconds: secsListened).inSeconds);
-  //   }
-  //   print('clearing bg stats');
-  //   await clearBgStats();
-  // }
+  var read = await readJSONFromCache('stats');
+  print('read ->$read');
+  if (read.isNotEmptyAndNotNull()) {
+    print('update stats');
+    var map = decoded(read);
+    var id = map['id'];
+    var secsListened = map['secsListened'];
+
+    if (map != null && map.isNotEmpty) {
+      await updateStreak();
+      await incrementNumSessions();
+      await markAsListened(id);
+      await updateMinuteCounter(Duration(seconds: secsListened).inSeconds);
+    }
+    print('clearing bg stats');
+    await clearBgStats();
+  }
 }

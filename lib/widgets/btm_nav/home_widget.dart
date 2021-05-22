@@ -47,7 +47,7 @@ class _HomeWidgetState extends State<HomeWidget> {
   final _bloc = HomeBloc(repo: HomeRepo());
   final _connectionBloc =
       ConnectionBloc(connectivityChecker: checkConnectivity);
-  ConnectivityResult _connectivityResult;
+  ConnectivityResult _currentConnectivity;
   final GlobalKey<AnnouncementBannerState> _announceKey = GlobalKey();
 
   final GlobalKey<SmallShortcutsRowWidgetState> _shortcutKey = GlobalKey();
@@ -62,8 +62,7 @@ class _HomeWidgetState extends State<HomeWidget> {
   void initState() {
     super.initState();
     _observeNetwork();
-    print('checking init state');
-     _connectionBloc.checkConnection();
+    _connectionBloc.checkConnection();
   }
 
   @override
@@ -78,7 +77,8 @@ class _HomeWidgetState extends State<HomeWidget> {
               stream: _connectionBloc.connectionStreamController.stream,
               initialData: true,
               builder: (context, connectionSnapshot) {
-                print('connection snapshot ${connectionSnapshot.data} - ${connectionSnapshot.hasData && !connectionSnapshot.data}' );
+                print(
+                    'connection snapshot ${connectionSnapshot.data}');
                 if (connectionSnapshot.hasData && !connectionSnapshot.data) {
                   return _buildErrorPacksWidget();
                 } else {
@@ -154,14 +154,14 @@ class _HomeWidgetState extends State<HomeWidget> {
     subscription = Connectivity()
         .onConnectivityChanged
         .listen((ConnectivityResult result) {
-      print('checking observe network outside current $_connectivityResult - new $result');
+      // print('checking observe network outside current $_connectivityResult - new $result');
 
-      _connectivityResult ??= result;
-          if (_connectivityResult != result) {
-            print('checking observe network');
-            _connectivityResult = result;
-            _refresh();
-          }
+      // _connectivityResult ??= result;
+      //     if (_connectivityResult != result) {
+      //       print('checking observe network');
+      //       _connectivityResult = result;
+      _refresh();
+      // }
     });
   }
 }
