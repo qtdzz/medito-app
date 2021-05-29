@@ -38,10 +38,11 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   sharedPreferences = await SharedPreferences.getInstance();
+  await Auth.init();
 
   if (kReleaseMode) {
     await SentryFlutter.init((options) {
-      options.dsn = SENTRY_URL;
+      options.dsn = Auth.getSentryUrl();
     }, appRunner: () => runApp(ParentWidget()));
   } else {
     runApp(ParentWidget());

@@ -45,7 +45,7 @@ class Tracking {
   static const String TYPE = 'type';
   static const String ITEM = 'item';
 
-  static String get url => BASE_URL + 'items/actions/';
+  static String get url => Auth.getBaseUrl() + 'items/actions/';
 
   static Future<void> trackEvent(Map<String, dynamic> map) async {
     //only track in release mode, not debug

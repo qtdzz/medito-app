@@ -53,9 +53,9 @@ class _Download {
       file.createSync();
     }
 
-    var url = BASE_URL + 'assets/' + currentFile.id;
+    var url = Auth.getBaseUrl() + 'assets/' + currentFile.id;
     var request = http.Request('GET', Uri.parse(url));
-    request.headers[HttpHeaders.authorizationHeader] = CONTENT_TOKEN;
+    request.headers[HttpHeaders.authorizationHeader] = Auth.getContentToken();
     var _response = await http.Client().send(request);
     _total = _response.contentLength;
     _received = 0;

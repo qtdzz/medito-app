@@ -18,6 +18,7 @@ import 'dart:async';
 import 'package:Medito/audioplayer/audio_player_service.dart';
 import 'package:Medito/audioplayer/media_lib.dart';
 import 'package:Medito/audioplayer/screen_state.dart';
+import 'package:Medito/network/auth.dart';
 import 'package:Medito/network/player/player_bloc.dart';
 import 'package:Medito/tracking/tracking.dart';
 import 'package:Medito/utils/colors.dart';
@@ -40,7 +41,7 @@ import 'package:pedantic/pedantic.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:share/share.dart';
 
-import 'background_sounds_sheet_widget.dart';
+import 'package:Medito/widgets/player/background_sounds_sheet_widget.dart';
 
 class PlayerWidget extends StatefulWidget {
   final normalPop;
@@ -520,7 +521,8 @@ void _audioPlayerTaskEntrypoint() async {
 }
 
 Future<void> start(MediaItem media) async {
-  var map = {'media': media.toJson()};
+  // Passing baseUrl and contentToken to background audio isolate(thread)
+  var map = {'media': media.toJson(), 'baseUrl': Auth.getBaseUrl(), 'contentToken': Auth.getContentToken()};
   unawaited(AudioService.connect());
   unawaited(AudioService.start(
     params: map,
