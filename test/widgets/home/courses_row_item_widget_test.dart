@@ -13,11 +13,11 @@ void main() {
     testData = Data(
       title: 'test_title',
       subtitle: 'test_subtitle',
-      backgroundImage: 'test_backgroundImage',
+      backgroundImage: '',
       type: 'test_type',
       id: 'test_id',
-      cover: 'test_cover',
-      colorPrimary: Colors.black.toString(),
+      cover: '',
+      colorPrimary: '',
     );
   });
 

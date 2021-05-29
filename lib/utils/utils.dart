@@ -25,7 +25,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 Widget getNetworkImageWidget(String url,
     {Color svgColor, double startHeight = 0.0}) {
-  final headers = {HttpHeaders.authorizationHeader: CONTENT_TOKEN};
+  final headers = {HttpHeaders.authorizationHeader: Auth.getContentToken()};
   return CachedNetworkImage(
     fit: BoxFit.fill,
     httpHeaders: headers,
@@ -112,6 +112,6 @@ extension EmptyOrNull on String {
 
 extension AssetUrl on String {
   String toAssetUrl() {
-    return '${BASE_URL}assets/$this?download';
+    return '${Auth.getBaseUrl()}assets/$this?download';
   }
 }

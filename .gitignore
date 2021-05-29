@@ -75,7 +75,7 @@ ios/*
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
 /.flutter-plugins-dependencies
 /.flutter-plugins
-/lib/network/auth.dart
+assets/api_keys.json
 gen/
 /pubspec.lock
 /android/keystore.properties
