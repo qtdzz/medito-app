@@ -85,7 +85,7 @@ class CoursesRowItemWidget extends StatelessWidget {
   }
 
   Widget _getNetworkImageWidget() {
-    if (data != null) {
+    if (data != null && data.cover.isNotEmptyAndNotNull()) {
       return getNetworkImageWidget(data.coverUrl);
     } else {
       return Container(

@@ -43,7 +43,7 @@ Future<void> _postUsage() async {
   var version = packageInfo.buildNumber;
 
   var ext = 'items/usage/';
-  var url = BASE_URL + ext;
+  var url = Auth.getBaseUrl() + ext;
   try {
     unawaited(
         httpPost(url, await generatedToken, body: {'app_version': version}));
@@ -69,7 +69,7 @@ Future _clearStorage(SharedPreferences prefs) async {
 class UserRepo {
   static Future<Map<String, String>> createUser() async {
     var ext = 'users/';
-    var url = BASE_URL + ext;
+    var url = Auth.getBaseUrl() + ext;
 
     var now = DateTime.now().millisecondsSinceEpoch.toString();
 
@@ -124,7 +124,7 @@ class UserRepo {
 
     var id = '';
     try {
-      final response = await httpPost(url, INIT_TOKEN, body: defaultMap);
+      final response = await httpPost(url, Auth.getInitToken(), body: defaultMap);
       id = response != null ? UserResponse.fromJson(response).data.id : 'EMPTY';
     } catch (e, st) {
       unawaited(Sentry.captureException(e, stackTrace: st, hint: token));

@@ -38,7 +38,7 @@ Future httpGet(String url,
     cache = await readJSONFromCache(fileNameForCache ?? url);
   }
 
-  var auth = CONTENT_TOKEN;
+  var auth = Auth.getContentToken();
   assert(auth.isNotEmpty);
   assert(auth != null);
 

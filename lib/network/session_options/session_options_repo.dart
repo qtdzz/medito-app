@@ -32,9 +32,9 @@ class SessionOptionsRepository {
     var url;
 
     if (screen == Screen.daily) {
-      url = BASE_URL + dailiesExt + id + parameters;
+      url = Auth.getBaseUrl() + dailiesExt + id + parameters;
     } else {
-      url = BASE_URL + ext + id + parameters;
+      url = Auth.getBaseUrl() + ext + id + parameters;
     }
 
     final response = await httpGet(url, skipCache: skipCache);
