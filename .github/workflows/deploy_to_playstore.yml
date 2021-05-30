@@ -15,57 +15,62 @@ on:
 jobs:
   fastlane-deploy:
     runs-on: ubuntu-latest
+    environment: prod
     steps:
       # Set up Flutter.
-      - name: Clone Flutter repository with stable channel
-        uses: subosito/flutter-action@v1.5.0
-        with:
-          channel: stable
-      - run: flutter doctor -v
-
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      # Fixme: https://github.com/meditohq/medito-app/issues/151
-      - name: Create auth.dart
-        run: sh ./.github/scripts/create_auth_dart.sh
-        env:
-          BASE_URL: ${{ secrets.AUTH_BASE_URL }}
-          SENTRY_URL: ${{ secrets.AUTH_SENTRY_URL }}
-          CONTENT_TOKEN: ${{ secrets.AUTH_CONTENT_TOKEN }}
-          INIT_TOKEN: ${{ secrets.AUTH_INIT_TOKEN }}
-
-      - name: Get dependencies
-        run: flutter pub get
-      - name: Analyze code
-        run: flutter analyze --no-fatal-warnings --no-fatal-infos .
-      - name: Run test
-        run: flutter test
-
-      # Setup Ruby, Bundler, and Gemfile dependencies
-      - name: Setup Fastlane
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '2.7.2'
-          bundler-cache: true
-          working-directory: android
-
-      - name: Create Upload Keystore file
+#      - name: Clone Flutter repository with stable channel
+#        uses: subosito/flutter-action@v1.5.0
+#        with:
+#          channel: stable
+#      - run: flutter doctor -v
+#
+#      - name: Checkout code
+#        uses: actions/checkout@v2
+#
+#      # Fixme: https://github.com/meditohq/medito-app/issues/151
+#      - name: Create auth.dart
+#        run: sh ./.github/scripts/create_auth_dart.sh
+#        env:
+#          BASE_URL: ${{ secrets.AUTH_BASE_URL }}
+#          SENTRY_URL: ${{ secrets.AUTH_SENTRY_URL }}
+#          CONTENT_TOKEN: ${{ secrets.AUTH_CONTENT_TOKEN }}
+#          INIT_TOKEN: ${{ secrets.AUTH_INIT_TOKEN }}
+#
+#      - name: Get dependencies
+#        run: flutter pub get
+#      - name: Analyze code
+#        run: flutter analyze --no-fatal-warnings --no-fatal-infos .
+#      - name: Run test
+#        run: flutter test
+#
+#      # Setup Ruby, Bundler, and Gemfile dependencies
+#      - name: Setup Fastlane
+#        uses: ruby/setup-ruby@v1
+#        with:
+#          ruby-version: '2.7.2'
+#          bundler-cache: true
+#          working-directory: android
+#
+#      - name: Create Upload Keystore file
+#        run: |
+#          echo "$PLAY_STORE_UPLOAD_KEY" | base64 --decode > app/upload-keystore.jks
+#        env:
+#          PLAY_STORE_UPLOAD_KEY: ${{ secrets.PLAY_STORE_UPLOAD_KEY }}
+#        working-directory: android
+      - name: test environment secret
         run: |
-          echo "$PLAY_STORE_UPLOAD_KEY" | base64 --decode > app/upload-keystore.jks
+          echo "$MY_SECRET"
         env:
-          PLAY_STORE_UPLOAD_KEY: ${{ secrets.PLAY_STORE_UPLOAD_KEY }}
-        working-directory: android
-
+          MY_SECRET: ${{ secrets.MY_SECRET }}
       # Build and deploy with Fastlane (by default, to beta track) 🚀.
       # Naturally, promote_to_production only deploys.
-      - run: ls ./app && flutter build appbundle -v
-        env:
-          FCI_KEYSTORE_PATH: 'upload-keystore.jks' # The file is created in the previous step
-          FCI_KEY_ALIAS: ${{ secrets.FCI_KEY_ALIAS }}
-          FCI_KEY_PASSWORD: ${{ secrets.FCI_KEY_PASSWORD }}
-          FCI_KEYSTORE_PASSWORD: ${{ secrets.FCI_KEYSTORE_PASSWORD }}
-        working-directory: android
+#      - run: ls ./app && flutter build appbundle -v
+#        env:
+#          FCI_KEYSTORE_PATH: 'upload-keystore.jks' # The file is created in the previous step
+#          FCI_KEY_ALIAS: ${{ secrets.FCI_KEY_ALIAS }}
+#          FCI_KEY_PASSWORD: ${{ secrets.FCI_KEY_PASSWORD }}
+#          FCI_KEYSTORE_PASSWORD: ${{ secrets.FCI_KEYSTORE_PASSWORD }}
+#        working-directory: android
 #      - run: bundle exec fastlane ${{ github.event.inputs.lane || 'beta' }}
 #        env:
 #          PLAY_STORE_CONFIG_JSON: ${{ secrets.PLAY_STORE_CONFIG_JSON }}
