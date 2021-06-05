@@ -115,6 +115,7 @@ class _PlayerWidgetState extends State<PlayerWidget> {
           builder: (context, screenStateSnapshot) {
             final screenState = screenStateSnapshot.data;
             final mediaItem = screenState?.mediaItem;
+            debugPrint('============screen state=============${mediaItem?.toJson().toString()}');
             final state = screenState?.playbackState;
             final processingState =
                 state?.processingState ?? AudioProcessingState.none;

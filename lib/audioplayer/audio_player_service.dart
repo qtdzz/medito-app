@@ -8,6 +8,7 @@ import 'package:Medito/network/cache.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:audio_service/audio_service.dart';
 import 'package:audio_session/audio_session.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:just_audio/just_audio.dart';
 
 //This is the duration of bgSound fade towards the end.
@@ -34,7 +35,11 @@ class AudioPlayerTask extends BackgroundAudioTask {
   @override
   Future<void> onStart(Map<String, dynamic> params) async {
     var mediaItemJson = params['media'];
+    mediaItemJson['album'] = 'Medito';
+    debugPrint('======before====== $mediaItemJson');
+
     mediaItem = MediaItem.fromJson(mediaItemJson);
+    debugPrint('======after======${mediaItem?.toJson().toString()}');
     // this bool var is set to true to avoid the volume increase
     var avoidVolumeIncreaseAtLastSec = false;
 

@@ -43,7 +43,13 @@ class DownloadsBloc {
 
     list.forEach((element) {
       try {
-        var file = MediaItem.fromJson(jsonDecode(element));
+        var mediaItemMap = jsonDecode(element);
+        // TODO: workaround
+        mediaItemMap['album'] = 'Medito';
+        debugPrint('======before in download======$mediaItemMap');
+        var file = MediaItem.fromJson(mediaItemMap);
+        debugPrint('======after in download====== ${file?.toJson().toString()}');
+        debugPrint(file.toJson().toString());
         fileList.add(file);
       } catch (exception, stackTrace) {
         print(stackTrace);
