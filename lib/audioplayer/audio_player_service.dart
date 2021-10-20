@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:Medito/audioplayer/media_lib.dart';
 import 'package:Medito/audioplayer/player_utils.dart';
-import 'package:Medito/network/auth.dart';
 import 'package:Medito/network/cache.dart';
 import 'package:Medito/utils/utils.dart';
 import 'package:audio_service/audio_service.dart';
@@ -34,6 +33,8 @@ class AudioPlayerTask extends BackgroundAudioTask {
   @override
   Future<void> onStart(Map<String, dynamic> params) async {
     var mediaItemJson = params['media'];
+    var baseUrl = params['baseUrl'];
+    var contentToken = params['contentToken'];
     mediaItem = MediaItem.fromJson(mediaItemJson);
     // this bool var is set to true to avoid the volume increase
     var avoidVolumeIncreaseAtLastSec = false;
@@ -47,9 +48,10 @@ class AudioPlayerTask extends BackgroundAudioTask {
       await getDownload(mediaItem.extras[LOCATION]).then((data) async {
         // (data == null) is true if this session has not been downloaded
         if (data == null) {
-          var url = '${BASE_URL}assets/${mediaItem.id}';
-          _duration = await _player.setUrl(url,
-              headers: {HttpHeaders.authorizationHeader: CONTENT_TOKEN});
+          var url = '${baseUrl}assets/${mediaItem.id}';
+          _duration = await _player.setUrl(url, headers: {
+            HttpHeaders.authorizationHeader: contentToken
+          });
         } else {
           _duration = await _player.setFilePath(data);
         }
