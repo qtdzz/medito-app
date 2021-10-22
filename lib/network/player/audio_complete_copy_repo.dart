@@ -20,10 +20,10 @@ import 'package:Medito/network/session_options/background_sounds.dart';
 
 class PlayerRepository {
   final _ext = 'items/player_copy?fields=*.*';
-  var bgSoundsUrl = '${BASE_URL}items/background_sounds';
+  var bgSoundsUrl = '${Auth.getBaseUrl()}items/background_sounds';
 
   Future<PlayerCopyResponse> fetchCopyData() async {
-    final response = await httpGet(BASE_URL + _ext);
+    final response = await httpGet(Auth.getBaseUrl() + _ext);
     return PlayerCopyResponse.fromJson(response);
   }
 
